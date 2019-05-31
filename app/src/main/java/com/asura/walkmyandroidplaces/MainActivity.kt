@@ -12,7 +12,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnTaskCompleted {
 
     companion object {
         const val TAG = "MainActivity"
@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         getLocation()
+
     }
 
     private fun getLocation() {
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
                         mLastLocation.latitude,
                         mLastLocation.longitude,
                         mLastLocation.time)
+                    FetchAddressTask(this).execute(it)
                 } else {
                     locationTextView.text = getString(R.string.no_location)
                 }
@@ -75,5 +77,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onTaskCompleted(result: String) {
+        addressTextView.text = getString(
+            R.string.address_text,
+            result,
+            System.currentTimeMillis()
+        )
     }
 }

@@ -5,4 +5,7 @@
         \n Timestamp: %3$tr"</string>
     <string name="no_location">No Location</string>
     <string name="service_not_available">Service Not Available</string>
+    <string name="invalid_lat_long_used">Invalid Lat Long Used</string>
+    <string name="address_not_found">Address Not Found</string>
+    <string name="address_text">"Address: %1$s \n Timestamp: %2$tr"</string>
 </resources>
