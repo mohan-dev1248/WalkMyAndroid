@@ -12,18 +12,20 @@ import java.lang.ref.WeakReference
 import java.util.*
 
 interface OnTaskCompleted{
-    fun onTaskCompleted(result: String)
+    fun onTaskCompleted(resultPair: Pair<Location?,String>)
 }
 
-class FetchAddressTask(private val notifier: OnTaskCompleted) : AsyncTask<Location, Unit, String>() {
+class FetchAddressTask(private val notifier: OnTaskCompleted) : AsyncTask<Location, Unit, Pair<Location?,String>>() {
 
     companion object {
         private const val TAG = "FetchAddressTask"
     }
 
+    //Currently the OnTaskCompleted's notifier will be a Context instance
+    //so getting them in the same parameter and converting it into second one later
     private val ctx: WeakReference<Context> = WeakReference(notifier as Context)
 
-    override fun doInBackground(vararg param: Location?): String {
+    override fun doInBackground(vararg param: Location?): Pair<Location?,String> {
         val geoCoder = Geocoder(ctx.get(), Locale.getDefault())
         val location = param[0]
         var addresses: List<Address>? = null
@@ -38,17 +40,17 @@ class FetchAddressTask(private val notifier: OnTaskCompleted) : AsyncTask<Locati
         } catch (e: IOException) {
             resultMessage = ctx.get()!!.getString(R.string.service_not_available)
             Log.e(TAG, resultMessage, e)
-            return resultMessage
+            return Pair(param[0],resultMessage)
         } catch (e: IllegalArgumentException) {
             resultMessage = ctx.get()!!.getString(R.string.invalid_lat_long_used)
             Log.e(TAG, resultMessage, e)
-            return resultMessage
+            return Pair(param[0],resultMessage)
         }
 
         if (addresses == null || addresses.isEmpty()) {
             resultMessage = ctx.get()!!.getString(R.string.address_not_found)
             Log.i(TAG, resultMessage)
-            return resultMessage
+            return Pair(param[0],resultMessage)
         }
 
         val address = addresses.get(0)
@@ -58,10 +60,10 @@ class FetchAddressTask(private val notifier: OnTaskCompleted) : AsyncTask<Locati
         }
 
         resultMessage = addressParts.joinToString (separator = "\n")
-        return resultMessage
+        return Pair(param[0],resultMessage)
     }
 
-    override fun onPostExecute(result: String) {
-        notifier.onTaskCompleted(result)
+    override fun onPostExecute(resultPair: Pair<Location?,String>) {
+        notifier.onTaskCompleted(resultPair)
     }
 }
