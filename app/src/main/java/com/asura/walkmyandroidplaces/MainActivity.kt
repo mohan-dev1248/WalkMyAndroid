@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity(), OnTaskCompleted {
 
     private var mTrackingLocation = false
 
+    private var mDistance = 0F
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -122,7 +124,7 @@ class MainActivity : AppCompatActivity(), OnTaskCompleted {
 
     private fun stopTrackingLocation() {
         mTrackingLocation = false
-
+        mDistance = 0F
         trackerButtonTextView.text = getString(R.string.press_the_button_to_start_tracking)
         trackerButton.text = getString(R.string.start_tracker_button)
 
@@ -151,12 +153,14 @@ class MainActivity : AppCompatActivity(), OnTaskCompleted {
         }
     }
 
-    override fun onTaskCompleted(resultPair: Pair<Location?,String>) {
+    override fun onTaskCompleted(resultPair: Pair<Location?,Pair<String,Float>>) {
         if (mTrackingLocation) {
+            mDistance += resultPair.second.second
             addressTextView.text = getString(
                 R.string.address_text,
-                resultPair.second,
-                System.currentTimeMillis()
+                resultPair.second.first,
+                System.currentTimeMillis(),
+                mDistance
             )
 
             locationTextView.text = getString(
